@@ -91,15 +91,13 @@ func (e *EntityDB) Search(key string, value interface{}) ([]Entity, error) {
 	var results []Entity
 	query := "select * from entity;"
 
-	/*stmt, err := e.db.Prepare(query)
+	stmt, err := e.db.Prepare(query)
 	if err != nil {
 		return results, err
 	}
 	defer stmt.Close()
 
-
-	*/
-	rows, err := e.db.Query(query)
+	rows, err := stmt.Query()
 	if err != nil {
 		return results, err
 	}
@@ -149,14 +147,13 @@ func (e *EntityDB) Lookup(id int) (Entity, error) {
 	entity := Entity{Id: id}
 
 	query := "SELECT name, description, properties FROM entity WHERE id = $1"
-	/*stmt, err := e.db.Prepare()
+	stmt, err := e.db.Prepare(query)
 	if err != nil {
 		return entity, err
 	}
 	defer stmt.Close()
-	*/
 
-	err := e.db.QueryRow(query, entity.Id).Scan(&entity.Name, &entity.Description, &entity.Properties)
+	err = stmt.QueryRow(entity.Id).Scan(&entity.Name, &entity.Description, &entity.Properties)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -172,7 +169,8 @@ func (e *EntityDB) Lookup(id int) (Entity, error) {
 
 func (e *EntityDB) Delete(id int) (int, error) {
 	var n int
-	stmt, err := e.db.Prepare(`DELETE FROM entity WHERE id=$1 RETURNING id`)
+	query := "DELETE FROM entity WHERE id=$1 RETURNING id"
+	stmt, err := e.db.Prepare(query)
 	if err != nil {
 		return n, err
 	}
