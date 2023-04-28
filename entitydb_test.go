@@ -82,26 +82,6 @@ func BenchmarkEntityDB_Search(b *testing.B) {
 	}
 }
 
-func BenchmarkEntityDB_Search2(b *testing.B) {
-	db := NewEntityDB(host, port, user, password, dbname)
-
-	for n := 0; n < b.N; n++ {
-		e := newEntity()
-		err := db.Insert(e)
-		if err != nil {
-			b.Fail()
-		}
-
-		results, err := db.Search("email", e.Properties["email"])
-		if err != nil {
-			b.Fail()
-		}
-		if len(results) == 0 {
-			b.Fail()
-		}
-	}
-}
-
 func TestEntityDB_Insert(t *testing.T) {
 	db := NewEntityDB(host, port, user, password, dbname)
 
