@@ -21,7 +21,10 @@ func newEntity() Entity {
 	properties := PropertyMap{
 		"email": gofakeit.Email(),
 		"phone": gofakeit.Phone(),
-		//"address": gofakeit.Address(),
+		"data": PropertyMap{
+			"address":    gofakeit.Address(),
+			"searchable": true,
+		},
 	}
 
 	return Entity{
@@ -51,7 +54,7 @@ func TestEntityDB_Search(t *testing.T) {
 		t.Fail()
 	}
 
-	results, err := db.Search("email", e.Properties["email"])
+	results, err := db.Search("searchable", true)
 	if err != nil {
 		t.Fail()
 	}

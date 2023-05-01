@@ -87,6 +87,23 @@ func NewEntityDB(host string, port int, user, password, dbname string) EntityDB 
 
 }
 
+// GetVal recursively searches through nested maps to find the key.
+func GetVal(data map[string]any, key string) (result any, found bool) {
+	for k, v := range data {
+		if k == key {
+			return v, true
+		} else {
+			switch v.(type) {
+			case map[string]any:
+				if result, found = GetVal(v.(map[string]any), key); found {
+					return
+				}
+			}
+		}
+	}
+	return nil, false
+}
+
 func (e *EntityDB) Search(key string, value interface{}) ([]Entity, error) {
 	var results []Entity
 	query := "select * from entity;"
@@ -107,7 +124,7 @@ func (e *EntityDB) Search(key string, value interface{}) ([]Entity, error) {
 		if err = rows.Scan(&entity.Id, &entity.Name, &entity.Description, &entity.Properties); err != nil {
 			panic(err)
 		} else {
-			val, ok := entity.Properties[key]
+			val, ok := GetVal(entity.Properties, key)
 			// if the key exists
 			if ok {
 				// if there is a match add it to the results
