@@ -60,7 +60,7 @@ func (p *PropertyMap) Scan(src interface{}) error {
 	return nil
 }
 
-func NewEntityDB(host string, port int, user, password, dbname string) EntityDB {
+func NewEntityDB(host string, port int, user, password, dbname string) (EntityDB, error) {
 	// connection string
 	psqlconn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
 
@@ -72,9 +72,6 @@ func NewEntityDB(host string, port int, user, password, dbname string) EntityDB 
 
 	// check db
 	err = db.Ping()
-	if err != nil {
-		panic(err)
-	}
 
 	return EntityDB{
 		host:     host,
@@ -83,7 +80,7 @@ func NewEntityDB(host string, port int, user, password, dbname string) EntityDB 
 		password: password,
 		dbname:   dbname,
 		db:       db,
-	}
+	}, err
 
 }
 
